@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+data/logs/
+storage/logs/
+
+# Runtime data
+data/stream/
+data/cache/
+data/packages/
+data/queue/
+data/sent/
+data/failed/
+storage/events/
+storage/uploads/
+storage/tmp/
+storage/cache/
+
+# DB / local state
+*.db
+*.sqlite
+*.sqlite3
+
+# Model weights / heavy artifacts
+*.pt
+*.pth
+*.onnx
+*.engine
+*.bin
+*.safetensors
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/

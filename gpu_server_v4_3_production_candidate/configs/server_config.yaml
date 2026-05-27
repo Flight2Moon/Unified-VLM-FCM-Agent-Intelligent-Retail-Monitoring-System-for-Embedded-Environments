@@ -1,0 +1,201 @@
+server:
+  host: "0.0.0.0"
+  port: 8008
+  public_base_url: "http://127.0.0.1:8008"
+  max_upload_mb: 120
+  title: "EAGER GPU Server v4"
+
+runtime:
+  # cpu | cuda | metal | low_vram | api | off
+  # api = use Google AI Studio Gemini API through GEMINI_API_KEY
+  profile: "low_vram"
+  max_workers: 2
+
+storage:
+  root_dir: "./storage"
+  events_dir: "./storage/events"
+  logs_dir: "./storage/logs"
+  cache_dir: "./storage/cache"
+  datasets_dir: "./storage/datasets"
+  models_dir: "./storage/model_registry"
+  db_path: "./storage/eager_server.sqlite3"
+
+api:
+  enable_cors: true
+  cors_origins: ["*"]
+
+processing:
+  mode: "async"  # async | sync
+  recovery:
+    older_than_sec: 600
+    startup_action: "mark_failed"  # mark_failed | requeue
+  keep_uploaded_zip: true
+  unzip_package: true
+  allowed_image_ext: [".jpg", ".jpeg", ".png", ".webp"]
+  keyframe_names:
+    curr: ["frame_t.jpg", "context_t.jpg", "current.jpg", "test_frame.jpg"]
+    prev: ["frame_t_minus_1.jpg", "t_minus_1.jpg", "t-1.jpg"]
+    next: ["frame_t_plus_1.jpg", "t_plus_1.jpg", "t+1.jpg"]
+
+vlm:
+  provider: "ollama"  # ollama | gemini | off. Set runtime.profile="api" or provider="gemini" for Google AI Studio.
+
+gemini:
+  enabled: true
+  api_key_env: "GEMINI_API_KEY"
+  model: "gemini-2.5-flash"
+  base_url: "https://generativelanguage.googleapis.com/v1beta"
+  timeout_sec: 90
+  temperature: 0.0
+  max_output_tokens: 768
+
+ollama:
+  enabled: true
+  base_url: "http://localhost:11434"
+  model: "gemma4:e4b"   # change freely: qwen2.5vl:7b, llava:latest, llama3.2-vision, etc.
+  timeout_sec: 120
+  temperature: 0.0
+  num_predict: 512
+  num_ctx: 4096
+  low_vram_options:
+    num_gpu: 20
+    num_thread: 12
+  cpu_options:
+    num_gpu: 0
+    num_thread: 12
+  fallback_to_geometry: true
+
+vlm_relation:
+  enabled: true
+  # For Google API free-tier experiments, scene_only is recommended first.
+  mode: "hybrid"  # scene_only | pairwise_only | hybrid | off
+  structured_output: true
+  retry_on_invalid_json: true
+  max_retries: 1
+  save_prompt: true
+  save_raw_response: true
+  use_full_frame: true
+  use_overlay: true
+  use_pairwise_union_crop: true
+  max_scene_relations: 8
+  max_pairwise_checks: 6
+  max_pairs_per_person: 3
+  min_object_confidence: 0.15
+  candidate_pair_distance_px: 220
+  allowed_relations:
+    - near
+    - standing_near
+    - touching
+    - touching_candidate
+    - holding_candidate
+    - carrying_candidate
+    - using
+    - looking_at
+    - reaching_toward
+    - sitting_on
+    - facing
+    - interacting_with
+    - inside_zone
+    - entering_zone
+    - leaving_zone
+  prohibited_relations:
+    - stealing
+    - suspicious_intent
+    - wants_to
+    - trying_to_hide
+    - malicious_intent
+    - criminal_intent
+  consolidation:
+    suppress_near_if_semantic_relation_exists: true
+    max_final_edges: 12
+    min_semantic_confidence: 0.45
+    store_near_in_memory: false
+
+relation_geometry:
+  enabled: true
+  max_edges: 12
+  near_distance_px: 180
+  overlap_iou_threshold: 0.12
+  touching_relation: "touching_candidate"
+
+scoring:
+  thresholds:
+    normal: 0.35
+    suspicious: 0.60
+    abnormal: 0.80
+  weights:
+    rarity: 0.25
+    semantic_strength: 0.25
+    rule: 0.20
+    uncertainty: 0.15
+    persistence: 0.15
+
+# Edge v4.2 can pull this policy from /api/detection-policy
+detection_policy:
+  version: 1
+  always_keep_labels: ["person"]
+  important_labels: ["cell phone", "laptop", "bottle", "cup", "book", "backpack", "box", "tool"]
+  ignore_labels: ["snowboard", "tennis racket", "toothbrush", "refrigerator"]
+  class_thresholds:
+    person: 0.25
+    chair: 0.35
+    potted plant: 0.35
+    dining table: 0.35
+    laptop: 0.20
+    bottle: 0.20
+    cup: 0.20
+    book: 0.20
+    cell phone: 0.20
+  default_conf_thres: 0.20
+  max_objects: 12
+  max_objects_per_label: 3
+  apply_to_edge: true
+
+dataset_builder:
+  enabled: true
+  target_task: "uniform_classification"
+  collect_labels: ["person"]
+  crop_types: ["person", "upper_body"]
+  root_dir: "./storage/datasets"
+  limits:
+    max_total_samples: 5000
+    max_samples_per_class: 1000
+    max_samples_per_label: 300
+    max_samples_per_video: 200
+    max_samples_per_event: 5
+    max_samples_per_day: 1000
+    max_unlabeled_queue: 1000
+    max_pseudo_labeled: 3000
+    max_human_labeled: 2000
+  quality_filter:
+    min_bbox_area_ratio: 0.01
+    max_bbox_area_ratio: 0.90
+    min_confidence: 0.25
+    min_brightness: 20
+    max_brightness: 245
+  duplicate_filter:
+    enabled: true
+    method: "average_hash"
+    hamming_threshold: 4
+  validation:
+    human_labeled_only: true
+
+training:
+  enabled: false
+  schedule:
+    enabled: false
+    hour: 3
+    minute: 0
+  min_new_samples: 100
+  command: "python scripts/train_uniform_classifier.py --config configs/server_config.yaml"
+
+retention:
+  events:
+    max_events: 5000
+    max_age_days: 30
+    max_total_mb: 20480
+  models:
+    keep_last_n_versions: 5
+  datasets:
+    protect_human_labeled: true
+    max_unlabeled_age_days: 60

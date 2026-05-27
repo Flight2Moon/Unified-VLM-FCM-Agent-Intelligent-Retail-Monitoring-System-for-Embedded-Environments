@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "always_keep_labels": [
+    "person"
+  ],
+  "important_labels": [
+    "cell phone",
+    "laptop",
+    "bottle",
+    "cup",
+    "book",
+    "backpack",
+    "box",
+    "tool"
+  ],
+  "ignore_labels": [
+    "snowboard",
+    "tennis racket",
+    "toothbrush",
+    "refrigerator"
+  ],
+  "class_thresholds": {
+    "person": 0.25,
+    "chair": 0.35,
+    "potted plant": 0.35,
+    "dining table": 0.35,
+    "laptop": 0.2,
+    "bottle": 0.2,
+    "cup": 0.2,
+    "book": 0.2,
+    "cell phone": 0.2
+  },
+  "default_conf_thres": 0.2,
+  "max_objects": 12,
+  "max_objects_per_label": 3,
+  "apply_to_edge": true,
+  "updated_at": "2026-05-26T07:17:59.092672+00:00"
+}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EAGER GPU Server</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>EAGER GPU Server v4.3</h1>
+    <p>Edge-to-Server 진행상황 · Recovery · Graph Evidence · Gemini/Ollama VLM Provider</p>
+  </header>
+  <main>
+    <section class="card highlight">
+      <div class="section-head">
+        <div><h2>실시간 처리 파이프라인</h2><p class="muted">입력받은 파일 / 처리하고 있는 파일 / 처리가 끝난 파일을 분리해서 보여줍니다.</p></div>
+        <div><button onclick="loadAll()">Refresh</button><button onclick="recoverStale('mark_failed')">Recover stale</button><button onclick="recoverStale('requeue')">Requeue stale</button></div>
+      </div>
+      <pre id="pipelineCounts" class="compact-pre">loading...</pre>
+      <div class="kanban">
+        <div class="lane"><h3>입력받은 파일</h3><div id="lane-incoming"></div></div>
+        <div class="lane"><h3>처리하고 있는 파일</h3><div id="lane-processing"></div></div>
+        <div class="lane"><h3>처리가 끝난 파일</h3><div id="lane-done"></div></div>
+        <div class="lane danger"><h3>실패/복구 필요</h3><div id="lane-failed"></div></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Edge Nodes</h2>
+      <div id="edgeNodes" class="edge-node-grid">loading...</div>
+    </section>
+
+    <section class="grid">
+      <div class="card"><h2>Health</h2><pre id="health">loading...</pre></div>
+      <div class="card"><h2>Storage</h2><pre id="storage">loading...</pre></div>
+      <div class="card"><h2>Dataset</h2><pre id="dataset">loading...</pre></div>
+    </section>
+
+    <section class="card">
+      <h2>Recent Events</h2>
+      <table id="events"><thead><tr><th>Event</th><th>Status</th><th>Decision</th><th>Score</th><th>Source</th><th>Created</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>Detection Policy</h2>
+      <p class="muted">Motion Candidate는 GPU 서버 관계 추론 대상에서 제외하고, YOLO/detector 결과만 활용하도록 구성했습니다.</p>
+      <div class="policy-actions">
+        <input id="labelInput" placeholder="label e.g. chair" />
+        <button onclick="setLabel('ignore')">Ignore</button>
+        <button onclick="setLabel('important')">Important</button>
+        <button onclick="setLabel('keep')">Keep</button>
+      </div>
+      <pre id="policy">loading...</pre>
+    </section>
+
+    <section class="card">
+      <h2>Label Statistics</h2>
+      <table id="labels"><thead><tr><th>Label</th><th>Count</th><th>Avg Conf</th><th>Last Seen</th><th>Action</th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>Review Queue</h2>
+      <div id="review"></div>
+    </section>
+  </main>
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>

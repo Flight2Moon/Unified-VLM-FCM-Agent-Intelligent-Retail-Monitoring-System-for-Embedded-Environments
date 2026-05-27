@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "always_keep_labels": ["person"],
+  "important_labels": ["cell phone", "laptop", "bottle", "cup", "book"],
+  "ignore_labels": ["chair", "potted plant", "snowboard", "toothbrush", "tennis racket"],
+  "class_thresholds": {
+    "person": 0.25,
+    "chair": 0.50,
+    "potted plant": 0.50,
+    "laptop": 0.20,
+    "cell phone": 0.20,
+    "bottle": 0.20,
+    "cup": 0.20
+  },
+  "default_conf_thres": 0.20,
+  "max_objects": 12,
+  "max_objects_per_label": 3,
+  "apply_to_edge": true
+}

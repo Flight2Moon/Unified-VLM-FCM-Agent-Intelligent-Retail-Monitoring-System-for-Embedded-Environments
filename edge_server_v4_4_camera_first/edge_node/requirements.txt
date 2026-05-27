@@ -1,0 +1,8 @@
+opencv-python>=4.8.0
+numpy>=1.24.0
+Pillow>=10.0.0
+PyYAML>=6.0
+requests>=2.31.0
+# Optional but recommended for real YOLO detection.
+# Install manually if your environment has CUDA/PyTorch configured:
+# ultralytics>=8.3.0

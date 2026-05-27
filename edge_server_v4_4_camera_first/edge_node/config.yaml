@@ -1,0 +1,82 @@
+edge:
+  edge_id: "edge-01"
+  camera_id: "cam01"
+
+server:
+  base_url: "http://127.0.0.1:8008"
+  event_endpoint: "/api/events"
+  heartbeat_endpoint: "/api/edge/heartbeat"
+  detection_policy_endpoint: "/api/detection-policy"
+  edge_api_key_env: "EDGE_API_KEY"
+  timeout_sec: 15
+  verify_tls: false
+
+source:
+  # Default is camera because this project is camera-first.
+  # Allowed: camera, video_file, video_dir, image_dir
+  type: "camera"
+  camera_index: 0
+  camera_device: null       # Example: "/dev/video0". If set, takes priority over camera_index.
+  width: 1280
+  height: 720
+  fps: 15
+  warmup_frames: 5
+  read_timeout_sec: 5
+  video_file: "./data/samples/sample.mp4"
+  video_dir: "./data/samples/videos"
+  image_dir: "./data/samples/images"
+  loop: false
+  max_frames: 0             # 0 means unlimited.
+
+object_detection:
+  # For real detection, use ultralytics.
+  # Use "none" only for camera diagnosis or pipeline connectivity tests.
+  backend: "ultralytics"    # ultralytics | none
+  model_path: "yolov8n.pt"
+  device: "cpu"             # cpu | cuda:0
+  min_confidence: 0.35
+  iou: 0.45
+  imgsz: 640
+  allowed_labels: ["person", "chair", "laptop", "cell phone", "backpack", "bottle", "cup", "tv", "potted plant"]
+  max_objects_per_event: 30
+
+motion_candidate:
+  # v4.4 intentionally does not generate or transmit motion candidates.
+  enabled: false
+
+trigger:
+  enabled: true
+  # L1: only target label exists. L2: person plus interesting object. L3: reserved/zone-like rule.
+  event_labels: ["person"]
+  interesting_labels: ["laptop", "cell phone", "backpack", "bottle", "cup", "chair"]
+  min_event_interval_sec:
+    L1: 10
+    L2: 5
+    L3: 3
+  duplicate_suppression:
+    enabled: true
+    window_sec: 20
+    min_signature_similarity: 0.92
+
+package:
+  schema_version: "edge_event_v4.4"
+  output_dir: "./data/packages"
+  include_context_frame: true
+  include_overlay: true
+  include_crops: true
+  crop_padding_ratio: 0.08
+  jpeg_quality: 92
+
+runtime:
+  heartbeat_interval_sec: 10
+  upload_flush_interval_sec: 5
+  policy_sync_interval_sec: 30
+  status_write_interval_sec: 3
+  sleep_sec: 0.01
+
+uploader:
+  enabled: true
+  max_retry: 5
+  retry_backoff_sec: 5
+  max_upload_per_flush: 3
+  keep_sent: true

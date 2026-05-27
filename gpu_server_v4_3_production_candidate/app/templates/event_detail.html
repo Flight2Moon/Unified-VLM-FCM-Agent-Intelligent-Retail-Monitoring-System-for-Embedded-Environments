@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EAGER Event Detail</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Event Detail</h1>
+    <p><a class="header-link" href="/dashboard">← Dashboard</a> <span id="eventTitle"></span></p>
+  </header>
+  <main>
+    <section class="card highlight"><h2>Processing / VLM Quality</h2><div id="quality">loading...</div></section>
+
+    <section class="grid">
+      <div class="card"><h2>Event Summary</h2><pre id="summary">loading...</pre></div>
+      <div class="card"><h2>Scoring Breakdown</h2><pre id="scoring">loading...</pre></div>
+      <div class="card"><h2>VLM Runtime</h2><pre id="runtime">loading...</pre></div>
+    </section>
+
+    <section class="card"><h2>Evidence Images</h2><div id="assets" class="asset-grid"></div></section>
+
+    <section class="grid graph-grid">
+      <div class="card"><h2>Dynamic Evidence Graph</h2><p class="muted">노드를 클릭하면 해당 노드가 장면에서 어떤 객체였는지 crop 이미지와 bbox가 표시됩니다.</p><div id="graph" class="graph-box"></div></div>
+      <div class="card"><h2>Selected Node</h2><div id="nodePanel"></div></div>
+    </section>
+
+    <section class="card"><h2>VLM Calls</h2><p class="muted">Google AI Studio API 모드 또는 Ollama 모드에서 실제 호출된 prompt/response와 JSON 파싱 성공 여부를 확인합니다.</p><div id="vlmCalls"></div></section>
+
+    <section class="card"><h2>VLM / Geometry Relation Explanations</h2><p class="muted">각 관계가 어떤 근거로 최종 edge로 남았는지 확인합니다.</p><div id="relations"></div></section>
+
+    <section class="grid">
+      <div class="card"><h2>Uncertain Relations</h2><pre id="uncertain">loading...</pre></div>
+      <div class="card"><h2>Rejected Relations</h2><pre id="rejected">loading...</pre></div>
+      <div class="card"><h2>Dropped Edges</h2><pre id="dropped">loading...</pre></div>
+    </section>
+
+    <section class="card"><h2>Processing Logs</h2><div id="logs"></div></section>
+  </main>
+  <script>window.EVENT_ID = "{{ event_id }}";</script>
+  <script src="/static/event_detail.js"></script>
+</body>
+</html>
